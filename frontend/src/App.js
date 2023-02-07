@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Input from "./components/Input";
 
 import phoneApi from "./api/phoneApi";
+import Annoucement from "./components/Annoucement";
 
 function App() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [accessCode, setAccessCode] = useState("");
+  const [announcement, setAnnouncement] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  const accessCodeRef = useRef();
 
   const onFormSubmit = (e) => {
     e.preventDefault();
@@ -15,6 +20,8 @@ function App() {
   const onPhoneCreateRequest = () => {
     const postPhoneToServer = async () => {
       const { data } = await phoneApi.createNewAccessCode(phoneNumber);
+      setAnnouncement(data.message);
+      setIsError(!data.isSuccess);
       console.log(data);
     };
 
@@ -23,11 +30,16 @@ function App() {
 
   const onAccessCodeValidateRequest = () => {
     const postAccessCodeToServer = async () => {
-      const response = await phoneApi.validateAccessCode({
+      const { data } = await phoneApi.validateAccessCode({
         phoneNumber,
         accessCode,
       });
-      console.log(response);
+
+      setAnnouncement(data.message);
+      setIsError(!data.isSuccess);
+      accessCodeRef.current.value = "";
+      setAccessCode("");
+      console.log(data);
     };
 
     postAccessCodeToServer();
@@ -50,6 +62,7 @@ function App() {
           onChange={onPhoneInputChange}
         />
         <Input
+          reference={accessCodeRef}
           value={accessCode}
           label="access code"
           id="code"
@@ -73,6 +86,10 @@ function App() {
             Validate access code
           </button>
         </div>
+
+        {announcement && (
+          <Annoucement isError={isError}>{announcement}</Annoucement>
+        )}
       </form>
     </div>
   );

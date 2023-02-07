@@ -32,24 +32,21 @@ const PORT = process.env.PORT || 8000;
 const NODE_ENV = process.env.NODE_ENV;
 const ACCESS_CODE_LENGTH = Number(process.env.ACCESS_CODE_LENGTH);
 
-app.get("/api", (req, res) => {
-  res.status(200).json({ message: "OK" });
-});
-
 app.post("/api/phone/create", async (req, res) => {
   try {
     const { phoneNumber } = req.body;
 
     const accessCode = generateAccessCode(ACCESS_CODE_LENGTH);
     const savedData = { phoneNumber, accessCode };
-    const response = await db
-      .collection("accounts")
-      .doc(phoneNumber)
-      .set(savedData);
+    await db.collection("accounts").doc(phoneNumber).set(savedData);
 
-    res.status(200).json({ message: "OK", response, phoneNumber });
+    res.status(200).json({
+      isSuccess: true,
+      message: "Saved phone to database",
+      phoneNumber,
+    });
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).send({ isSuccess: false, message: "Error" });
   }
 });
 
@@ -60,15 +57,17 @@ app.post("/api/code/validate", async (req, res) => {
     const accessCodeInDb = query.data().accessCode;
 
     if (accessCode !== accessCodeInDb) {
-      res.status(403).json({ message: "Wrong access code" });
+      res.status(200).json({ isSuccess: false, message: "Wrong access code" });
+    } else {
+      res.status(200).json({
+        isSuccess: true,
+        message: "Access code match!",
+        account: { accessCode, phoneNumber },
+      });
     }
-
-    res.status(200).json({
-      message: "Access code match!",
-      account: { accessCode, phoneNumber },
-    });
   } catch (err) {
     console.log(err);
+    res.status(400).send({ isSuccess: false, message: "Error" });
   }
 });
 
