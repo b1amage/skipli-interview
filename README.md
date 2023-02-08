@@ -15,7 +15,11 @@
 
 ## Demonstration
 
-- (2 minutes)
+- https://drive.google.com/file/d/1bwoMfnGql3xJGyDJFyCS6blMumpG1zTd/view?usp=share_link
+
+## Phone screen
+
+![Screenshot](iphone.jpeg)
 
 ## Structure
 

@@ -20,7 +20,6 @@ function App() {
         /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
         "Please enter a valid phone number!"
       ),
-      // phone: Yup.string().matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
       code: Yup.string().matches(/^[0-9]{6,6}$/, "Please enter a 6-digit-code"),
     }),
   });
