@@ -1,3 +1,4 @@
+// import essential
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -7,18 +8,21 @@ const credentials = require("./firebaseKey.json");
 
 const app = express();
 dotenv.config();
-app.use(cors());
 
+// CORS and use json format
+app.use(cors());
 app.use(bodyParser.json({ type: "application/json" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Firebase config
 admin.initializeApp({
   credential: admin.credential.cert(credentials),
 });
 
 const db = admin.firestore();
 
+// Helpers
 const generateRandomInteger = (min, max) =>
   Math.floor(min + Math.random() * (max - min + 1));
 
@@ -28,10 +32,12 @@ const generateAccessCode = (length) =>
     .map(() => generateRandomInteger(1, 9))
     .join("");
 
+// Constants
 const PORT = process.env.PORT || 8000;
 const NODE_ENV = process.env.NODE_ENV;
 const ACCESS_CODE_LENGTH = Number(process.env.ACCESS_CODE_LENGTH);
 
+// Create phone
 app.post("/api/phone/create", async (req, res) => {
   try {
     const { phoneNumber } = req.body;
@@ -42,14 +48,14 @@ app.post("/api/phone/create", async (req, res) => {
 
     res.status(200).json({
       isSuccess: true,
-      message: "Saved phone to database",
-      phoneNumber,
+      message: `Your access code: ${accessCode}`,
     });
   } catch (err) {
     res.status(400).send({ isSuccess: false, message: "Error" });
   }
 });
 
+// Validate access code
 app.post("/api/code/validate", async (req, res) => {
   try {
     const { accessCode, phoneNumber } = req.body;

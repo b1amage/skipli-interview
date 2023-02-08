@@ -1,25 +1,34 @@
 import { useState, useRef } from "react";
 import Input from "./components/Input";
-
 import phoneApi from "./api/phoneApi";
 import Annoucement from "./components/Annoucement";
+import Button from "./components/Button";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 function App() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [accessCode, setAccessCode] = useState("");
   const [announcement, setAnnouncement] = useState("");
   const [isError, setIsError] = useState(false);
 
-  const accessCodeRef = useRef();
+  const formik = useFormik({
+    initialValues: {
+      phone: "",
+      code: "",
+    },
+    validationSchema: Yup.object({
+      phone: Yup.string().matches(
+        /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
+        "Please enter a valid phone number!"
+      ),
+      code: Yup.string().matches(/^[0-9]{6,6}$/, "Please enter a 6-digit-code"),
+    }),
+  });
 
-  const onFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Submmited with value: ", { phoneNumber, accessCode });
-  };
+  const accessCodeRef = useRef();
 
   const onPhoneCreateRequest = () => {
     const postPhoneToServer = async () => {
-      const { data } = await phoneApi.createNewAccessCode(phoneNumber);
+      const { data } = await phoneApi.createNewAccessCode(formik.values.phone);
       setAnnouncement(data.message);
       setIsError(!data.isSuccess);
       console.log(data);
@@ -31,60 +40,48 @@ function App() {
   const onAccessCodeValidateRequest = () => {
     const postAccessCodeToServer = async () => {
       const { data } = await phoneApi.validateAccessCode({
-        phoneNumber,
-        accessCode,
+        phoneNumber: formik.values.phone,
+        accessCode: formik.values.code,
       });
 
       setAnnouncement(data.message);
       setIsError(!data.isSuccess);
-      accessCodeRef.current.value = "";
-      setAccessCode("");
+      formik.setValues({ code: "", phone: "" });
       console.log(data);
     };
 
     postAccessCodeToServer();
   };
 
-  const onPhoneInputChange = (value) =>
-    setPhoneNumber((currentPhoneNumber) => value);
-
-  const onAccessCodeChange = (value) =>
-    setAccessCode((currentAccessCode) => value);
-
   return (
-    <div className="">
-      <form className="flex flex-col gap-5 p-10" onSubmit={onFormSubmit}>
+    <div className="flex items-center justify-center w-full min-h-screen bg-slate-100">
+      <form className="flex flex-col gap-5 p-10 mx-auto rounded-lg md:w-1/2 bg-primary-100">
         <Input
-          value={phoneNumber}
           label="phone number"
           id="phone"
           placeholder="Ex: 0913000112"
-          onChange={onPhoneInputChange}
+          value={formik.values.phone}
+          onChange={formik.handleChange}
+          err={formik.errors.phone}
         />
         <Input
           reference={accessCodeRef}
-          value={accessCode}
           label="access code"
           id="code"
           placeholder="Ex: 123456"
-          onChange={onAccessCodeChange}
+          value={formik.values.code}
+          onChange={formik.handleChange}
+          err={formik.errors.code}
         />
 
         <div className="flex gap-5">
-          <button
-            onClick={onPhoneCreateRequest}
-            type="button"
-            className="bg-primary-400 text-lg px-5 py-2 rounded-lg text-white font-semibold max-w-[240px]"
-          >
+          <Button onClick={onPhoneCreateRequest} type="button">
             Create phone number
-          </button>
-          <button
-            onClick={onAccessCodeValidateRequest}
-            type="button"
-            className="bg-primary-400 text-lg px-5 py-2 rounded-lg text-white font-semibold max-w-[240px]"
-          >
+          </Button>
+
+          <Button onClick={onAccessCodeValidateRequest} type="button">
             Validate access code
-          </button>
+          </Button>
         </div>
 
         {announcement && (
