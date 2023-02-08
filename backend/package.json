@@ -16,7 +16,8 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "firebase-admin": "^11.5.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "twilio": "^4.7.1"
   },
   "devDependencies": {
     "@babel/helper-compilation-targets": "^7.20.7"

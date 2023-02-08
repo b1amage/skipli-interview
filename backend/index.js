@@ -5,9 +5,13 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const admin = require("firebase-admin");
 const credentials = require("./firebaseKey.json");
+dotenv.config();
+
+const accountId = process.env.ID;
+const token = process.env.TOKEN;
+const client = require("twilio")(accountId, token);
 
 const app = express();
-dotenv.config();
 
 // CORS and use json format
 app.use(cors());
@@ -45,10 +49,17 @@ app.post("/api/phone/create", async (req, res) => {
     const accessCode = generateAccessCode(ACCESS_CODE_LENGTH);
     const savedData = { phoneNumber, accessCode };
     await db.collection("accounts").doc(phoneNumber).set(savedData);
+    client.messages
+      .create({
+        body: `Access code: ${accessCode}`,
+        from: process.env.TWILIO_NUMBER,
+        to: phoneNumber,
+      })
+      .then((message) => console.log(message.sid));
 
     res.status(200).json({
       isSuccess: true,
-      message: `Your access code: ${accessCode}`,
+      message: `Your access code is sent to ${phoneNumber}`,
     });
   } catch (err) {
     res.status(400).send({ isSuccess: false, message: "Error" });
