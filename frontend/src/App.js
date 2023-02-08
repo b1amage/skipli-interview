@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Input from "./components/Input";
 import phoneApi from "./api/phoneApi";
 import Annoucement from "./components/Annoucement";
@@ -23,8 +23,6 @@ function App() {
       code: Yup.string().matches(/^[0-9]{6,6}$/, "Please enter a 6-digit-code"),
     }),
   });
-
-  const accessCodeRef = useRef();
 
   const onPhoneCreateRequest = () => {
     const postPhoneToServer = async () => {
@@ -65,7 +63,6 @@ function App() {
           err={formik.errors.phone}
         />
         <Input
-          reference={accessCodeRef}
           label="access code"
           id="code"
           placeholder="Ex: 123456"
