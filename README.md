@@ -15,7 +15,7 @@
 
 ## Demonstration
 
-- https://www.youtube.com/watch?v=pAKRU2QV5eQ (2 minutes)
+- (2 minutes)
 
 ## Structure
 
