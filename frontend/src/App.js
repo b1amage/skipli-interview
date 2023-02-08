@@ -16,11 +16,11 @@ function App() {
       code: "",
     },
     validationSchema: Yup.object({
-      // phone: Yup.string().matches(
-      //   /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
-      //   "Please enter a valid phone number!"
-      // ),
-      phone: Yup.string(),
+      phone: Yup.string().matches(
+        /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+        "Please enter a valid phone number!"
+      ),
+      // phone: Yup.string().matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
       code: Yup.string().matches(/^[0-9]{6,6}$/, "Please enter a 6-digit-code"),
     }),
   });
